@@ -7,7 +7,7 @@ import {
 import Shop from './pages/shop/Shop';
 import Header from './Components/Header/Header';
 import Sign from './pages/SignUp_SignIn_Page/Sign';
-import {auth} from './firebase/firebase.utils';
+import {auth, createUserProfileDocument} from './firebase/firebase.utils';
 import './App.css';
 
 
@@ -18,19 +18,25 @@ class App extends React.Component {
       currentUser: null
     }
   }
-//   const nav = (props) => {
-//     console.log(props) returns props regarding the location or href because we have used the route
-//     return(
-//     <div>
-//       <Link to="/">Home</Link>
-//       <h1>Hats</h1>
-//     </div>
-//   )
-// }
+
   unsubscribeFromAuth = null;
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(user => {
-      this.setState({currentUser : user});
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      if(userAuth){
+        const userRef = await createUserProfileDocument(userAuth);
+        userRef.onSnapshot(snapshot => {
+            this.setState({
+              currentUser: {
+                id: snapshot.id,
+                ...snapshot.data()
+              }
+            });
+        })
+      }else{
+        this.setState({
+          currentUser: userAuth
+        })
+      }
     })
   }
 
