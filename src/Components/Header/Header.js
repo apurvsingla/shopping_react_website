@@ -2,9 +2,12 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import {ReactComponent as Logo} from '../../assets/crown.svg';
 import {auth} from '../../firebase/firebase.utils';
+import {connect} from 'react-redux';
+import CartIcon from '../CartIcon/CartIcon';
+import CartDropdown from '../CartDropDown/CartDropdown';
 import './Header.scss';
 
-const Header = ({currentUser}) => {
+const Header = ({currentUser, hidden}) => {
     return (
         <div className="header">
             <Link to='/'>
@@ -12,10 +15,10 @@ const Header = ({currentUser}) => {
             </Link>
             <div className="options">
                 <Link className="option" to="/shop">
-                    Shop
+                    SHOP
                 </Link>
                 <Link className="option" to="/shop">
-                    Contact
+                    CONTACT
                 </Link>
                 {
                     currentUser ?
@@ -23,11 +26,21 @@ const Header = ({currentUser}) => {
                         SIGN OUT
                     </div>
                     :
-                    <Link className="option" to="/sign-in">SignIn</Link>
+                    <Link className="option" to="/sign-in">SIGN-IN</Link>
                 }
+                <CartIcon />
             </div>
+            {
+                hidden ? null : <CartDropdown />
+            }
+            
         </div>
     );
 }
 
-export default Header;
+const mapStateToProps = ({user: {currentUser}, cart: {hidden}}) => ({
+    currentUser,
+    hidden
+  });
+  
+export default connect(mapStateToProps)(Header);
